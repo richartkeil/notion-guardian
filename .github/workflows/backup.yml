@@ -27,11 +27,11 @@ jobs:
       - name: Commit changes to configured repo
         uses: cpina/github-action-push-to-another-repository@master
         env:
-          API_TOKEN_GITHUB: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
+          API_TOKEN_GITHUB: ${{ secrets.REPO_PERSONAL_ACCESS_TOKEN }}
         with:
           source-directory: 'workspace'
-          destination-github-username: ${{ secrets.GITHUB_USERNAME }}
-          destination-repository-name: ${{ secrets.GITHUB_REPOSITORY_NAME }}
-          user-email: ${{ secrets.GITHUB_EMAIL }}
+          destination-github-username: ${{ secrets.REPO_USERNAME }}
+          destination-repository-name: ${{ secrets.REPO_NAME }}
+          user-email: ${{ secrets.REPO_EMAIL }}
           target-branch: 'main'
           commit-message: 'Automated Notion workspace backup'
