@@ -1,0 +1,37 @@
+name: "Backup Notion Workspace"
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    -   cron: "0 * * * *"
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    name: Backup
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: Run backup script
+        run: npm install && npm run backup
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+
+      - name: Commit changes to configured repo
+        uses: cpina/github-action-push-to-another-repository@master
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
+        with:
+          source-directory: 'workspace'
+          destination-github-username: ${{ secrets.GITHUB_USERNAME }}
+          destination-repository-name: ${{ secrets.GITHUB_REPOSITORY_NAME }}
+          user-email: ${{ secrets.GITHUB_EMAIL }}
+          target-branch: 'main'
+          commit-message: 'Automated Notion workspace backup'

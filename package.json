@@ -1,0 +1,16 @@
+{
+  "name": "notion-guardian",
+  "version": "1.0.0",
+  "description": "Keeps your Notion workspace safe and version controlled at all times.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "backup": "node index.js"
+  },
+  "author": "Richard Keil",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "extract-zip": "^2.0.1"
+  }
+}
