@@ -3,7 +3,7 @@ name: "Backup Notion Workspace"
 on:
   push:
     branches:
-      - master
+      - main
   schedule:
     -   cron: "0 * * * *"
 
