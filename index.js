@@ -1,6 +1,7 @@
 const axios = require(`axios`);
 const extract = require(`extract-zip`);
-const { createWriteStream, mkdirSync, rmdirSync, unlinkSync } = require(`fs`);
+const { createWriteStream } = require(`fs`);
+const { rm, mkdir, unlink } = require(`fs/promises`);
 const { join } = require(`path`);
 
 const notionAPI = `https://www.notion.so/api/v3`;
@@ -83,10 +84,10 @@ const run = async () => {
   const workspaceZip = join(process.cwd(), `workspace.zip`);
 
   await exportFromNotion(workspaceZip, `markdown`);
-  rmdirSync(workspaceDir, { recursive: true });
-  mkdirSync(workspaceDir, { recursive: true });
+  await rm(workspaceDir, { recursive: true, force: true });
+  await mkdir(workspaceDir, { recursive: true });
   await extract(workspaceZip, { dir: workspaceDir });
-  unlinkSync(workspaceZip);
+  await unlink(workspaceZip);
 
   console.log(`✅ Export downloaded and unzipped.`);
 };
