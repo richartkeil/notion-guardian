@@ -18,7 +18,7 @@ The tool separates the logic for running the export and the actual workspace dat
 8. Click the "Actions" tab on the forked repo and enable actions by clicking the button.
 9. On the left sidebar click the "Backup Notion Workspace" workflow. A notice will tell you that "Scheduled Actions" are disabled, so go ahead and click the button to enable them.
 10. Wait until the action runs for the first time or push a commit to the repo to trigger the first backup.
-11. Check your private repo to see that an automatic commit with your Notion workspace data has been made. Done 🙌
+11. Check your private repo to see that an automatic commit with your Notion workspace data has been made. Done  🙌
 
 ## How it works
 
