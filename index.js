@@ -5,17 +5,18 @@ const { rm, mkdir, unlink } = require(`fs/promises`);
 const { join } = require(`path`);
 
 const notionAPI = `https://www.notion.so/api/v3`;
-const { NOTION_TOKEN, NOTION_SPACE_ID } = process.env;
+const { NOTION_TOKEN, NOTION_SPACE_ID, NOTION_USER_ID } = process.env;
 const client = axios.create({
   baseURL: notionAPI,
   headers: {
-    Cookie: `token_v2=${NOTION_TOKEN}`,
+    Cookie: `token_v2=${NOTION_TOKEN};`,
+    "x-notion-active-user-header": NOTION_USER_ID,
   },
 });
 
-if (!NOTION_TOKEN || !NOTION_SPACE_ID) {
+if (!NOTION_TOKEN || !NOTION_SPACE_ID || !NOTION_USER_ID) {
   console.error(
-    `Environment variable NOTION_TOKEN or NOTION_SPACE_ID is missing. Check the README.md for more information.`
+    `Environment variable NOTION_TOKEN, NOTION_SPACE_ID or NOTION_USER_ID is missing. Check the README.md for more information.`
   );
   process.exit(1);
 }
