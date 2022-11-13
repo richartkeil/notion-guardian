@@ -9,17 +9,15 @@ The tool separates the logic for running the export and the actual workspace dat
 ## How to setup
 
 1. Create a separate private repository for your backups to live in (e.g. "my-notion-backup"). Make sure you create a `main` branch — for example by clicking "Add a README file" when creating the repo.
-2. Fork this repository ("notion-guardian").
-3. Create a Personal Access Token ([docs](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)) with the "repo" scope and store it as `REPO_PERSONAL_ACCESS_TOKEN` in the secrets of the forked repo.
+2. Use this repository ("notion-guardian") as a template in order to create a copy (Click the green "Use this template" button).
+3. Create a Personal Access Token ([docs](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)) with the "repo" scope and store it as `REPO_PERSONAL_ACCESS_TOKEN` in the secrets of the copied repo.
 4. Store your GitHub username in the `REPO_USERNAME` secret.
 5. Store the name of your newly created private repo in the `REPO_NAME` secret (in this case "my-notion-backup").
 6. Store the email that should be used to commit changes (usually your GitHub account email) in the `REPO_EMAIL` secret.
 7. Obtain your Notion space-id and token as described [in this Medium post](https://medium.com/@arturburtsev/automated-notion-backups-f6af4edc298d). Store it in the `NOTION_SPACE_ID` and `NOTION_TOKEN` secret.
 8. You will also need to obtain your `notion_user_id` the same way and store it in a `NOTION_USER_ID` secret.
-9. Click the "Actions" tab on the forked repo and enable actions by clicking the button.
-10. On the left sidebar click the "Backup Notion Workspace" workflow. A notice will tell you that "Scheduled Actions" are disabled, so go ahead and click the button to enable them.
-11. Wait until the action runs for the first time or push a commit to the repo to trigger the first backup.
-12. Check your private repo to see that an automatic commit with your Notion workspace data has been made. Done 🙌
+9. Wait until the action runs for the first time or push a commit to the repo to trigger the first backup.
+10. Check your private repo to see that an automatic commit with your Notion workspace data has been made. Done 🙌
 
 ## How it works
 
