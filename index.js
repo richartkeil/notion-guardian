@@ -4,10 +4,10 @@ const { createWriteStream } = require(`fs`);
 const { rm, mkdir, unlink } = require(`fs/promises`);
 const { join } = require(`path`);
 
-const notionAPI = `https://www.notion.so/api/v3`;
+const unofficialNotionAPI = `https://www.notion.so/api/v3`;
 const { NOTION_TOKEN, NOTION_SPACE_ID, NOTION_USER_ID } = process.env;
 const client = axios.create({
-  baseURL: notionAPI,
+  baseURL: unofficialNotionAPI,
   headers: {
     Cookie: `token_v2=${NOTION_TOKEN};`,
     "x-notion-active-user-header": NOTION_USER_ID,
