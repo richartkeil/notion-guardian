@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    -   cron: "0 * * * *"
+    -   cron: "0 0 * * *"
 
 jobs:
   backup:
@@ -16,22 +16,34 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '16'
 
       - name: Run backup script
         run: npm install && npm run backup
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+          NOTION_USER_ID: ${{ secrets.NOTION_USER_ID }}
 
-      - name: Commit changes to configured repo
-        uses: cpina/github-action-push-to-another-repository@master
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.REPO_PERSONAL_ACCESS_TOKEN }}
+      - name: Checkout backup repo
+        uses: actions/checkout@v2
         with:
-          source-directory: 'workspace'
-          destination-github-username: ${{ secrets.REPO_USERNAME }}
-          destination-repository-name: ${{ secrets.REPO_NAME }}
-          user-email: ${{ secrets.REPO_EMAIL }}
-          target-branch: 'main'
-          commit-message: 'Automated Notion workspace backup'
+          repository: ${{ secrets.REPO_USERNAME }}/${{ secrets.REPO_NAME }}
+          token: ${{ secrets.REPO_PERSONAL_ACCESS_TOKEN }}
+          path: "backup-repo"
+      
+      - name: Commit changes to backup repo
+        env:
+          REPO_EMAIL: ${{ secrets.REPO_EMAIL }}
+          REPO_USERNAME: ${{ secrets.REPO_USERNAME }}
+        run: |
+          cp -a workspace/. backup-repo/
+          cd backup-repo
+          git config --local user.email "${REPO_EMAIL}"
+          git config --local user.name "${REPO_USERNAME}"
+          git add .
+          if [ -z "$(git status --porcelain)" ]; then
+            exit 0
+          fi
+          git commit -m "Automated Notion workspace backup"
+          git push

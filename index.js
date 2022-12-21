@@ -1,20 +1,22 @@
 const axios = require(`axios`);
 const extract = require(`extract-zip`);
-const { createWriteStream, mkdirSync, rmdirSync, unlinkSync } = require(`fs`);
+const { createWriteStream } = require(`fs`);
+const { rm, mkdir, unlink } = require(`fs/promises`);
 const { join } = require(`path`);
 
 const unofficialNotionAPI = `https://www.notion.so/api/v3`;
-const { NOTION_TOKEN, NOTION_SPACE_ID } = process.env;
+const { NOTION_TOKEN, NOTION_SPACE_ID, NOTION_USER_ID } = process.env;
 const client = axios.create({
   baseURL: unofficialNotionAPI,
   headers: {
-    Cookie: `token_v2=${NOTION_TOKEN}`,
+    Cookie: `token_v2=${NOTION_TOKEN};`,
+    "x-notion-active-user-header": NOTION_USER_ID,
   },
 });
 
-if (!NOTION_TOKEN || !NOTION_SPACE_ID) {
+if (!NOTION_TOKEN || !NOTION_SPACE_ID || !NOTION_USER_ID) {
   console.error(
-    `Environment variable NOTION_TOKEN or NOTION_SPACE_ID is missing. Check the README.md for more information.`
+    `Environment variable NOTION_TOKEN, NOTION_SPACE_ID or NOTION_USER_ID is missing. Check the README.md for more information.`
   );
   process.exit(1);
 }
@@ -53,6 +55,11 @@ const exportFromNotion = async (destination, format) => {
     } = await client.post(`getTasks`, { taskIds: [taskId] });
     const task = tasks.find((t) => t.id === taskId);
 
+    if (task.error) {
+      console.error(`❌ Export failed with reason: ${task.error}`);
+      process.exit(1);
+    }
+
     console.log(`Exported ${task.status.pagesExported} pages.`);
 
     if (task.state === `success`) {
@@ -83,10 +90,10 @@ const run = async () => {
   const workspaceZip = join(process.cwd(), `workspace.zip`);
 
   await exportFromNotion(workspaceZip, `markdown`);
-  rmdirSync(workspaceDir, { recursive: true });
-  mkdirSync(workspaceDir, { recursive: true });
+  await rm(workspaceDir, { recursive: true, force: true });
+  await mkdir(workspaceDir, { recursive: true });
   await extract(workspaceZip, { dir: workspaceDir });
-  unlinkSync(workspaceZip);
+  await unlink(workspaceZip);
 
   console.log(`✅ Export downloaded and unzipped.`);
 };
