@@ -41,6 +41,13 @@ jobs:
           cd backup-repo
           git config --local user.email "${REPO_EMAIL}"
           git config --local user.name "${REPO_USERNAME}"
+
+          # Fix large zip file export error by using Git LFS.
+          sudo apt install git-lfs
+          git lfs install
+          git lfs track "*.zip"
+          git add .gitattributes 
+
           git add .
           if [ -z "$(git status --porcelain)" ]; then
             exit 0
