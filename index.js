@@ -100,7 +100,21 @@ const run = async () => {
   await exportFromNotion(workspaceZip, `markdown`);
   await rm(workspaceDir, { recursive: true, force: true });
   await mkdir(workspaceDir, { recursive: true });
-  await extract(workspaceZip, { dir: workspaceDir });
+  await extract(workspaceZip, {
+    dir: workspaceDir, onEntry: async (entry, zipfile) => {
+      if (entry.fileName.toLowerCase().endsWith('.zip')) {
+        const nestedZipFile = join(workspaceDir, entry.fileName);
+        zipfile.openReadStream(entry, (err, readStream) => {
+          if (err) throw err;
+          const writeStream = createWriteStream(nestedZipFile);
+          readStream.pipe(writeStream);
+          writeStream.on('finish', () => {
+            extract(nestedZipFile, { dir: workspaceDir })
+          });
+        });
+      }
+    }
+  });
   await unlink(workspaceZip);
 
   console.log(`✅ Export downloaded and unzipped.`);
