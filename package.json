@@ -10,7 +10,7 @@
   "author": "Richard Keil",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21",
-    "extract-zip": "^2.0.1"
+    "adm-zip": "^0.5.10",
+    "axios": "^0.21"
   }
 }
