@@ -34,10 +34,13 @@ const exportFromNotion = async (destination, format) => {
     eventName: `exportSpace`,
     request: {
       spaceId: NOTION_SPACE_ID,
+      shouldExportComments: false,
       exportOptions: {
         exportType: format,
+        collectionViewExportType: `currentView`,
         timeZone: `Europe/Berlin`,
         locale: `en`,
+        preferredViewMap: {},
       },
     },
   };
