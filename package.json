@@ -5,12 +5,18 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "backup": "node index.js"
+    "backup": "ts-node index.ts"
   },
   "author": "Richard Keil",
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.5.10",
     "axios": "^0.21"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/adm-zip": "^0.5.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   }
 }
