@@ -1,3 +1,4 @@
+import "dotenv/config";
 import axios from "axios";
 import AdmZip from "adm-zip";
 import { createWriteStream, promises as fs } from "fs";
