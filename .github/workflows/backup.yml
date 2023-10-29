@@ -13,10 +13,10 @@ jobs:
     name: Backup
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'
 
       - name: Run backup script
         run: npm install && npm run backup
@@ -26,7 +26,7 @@ jobs:
           NOTION_USER_ID: ${{ secrets.NOTION_USER_ID }}
 
       - name: Checkout backup repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ secrets.REPO_USERNAME }}/${{ secrets.REPO_NAME }}
           token: ${{ secrets.REPO_PERSONAL_ACCESS_TOKEN }}
