@@ -63,32 +63,47 @@ const exportFromNotion = async (
 
   let exportURL: string;
   let fileTokenCookie: string | undefined;
+  let retries = 0;
+
   while (true) {
-    await sleep(2);
-    const {
-      data: { results: tasks },
-      headers: { "set-cookie": getTasksRequestCookies },
-    }: {
-      data: { results: NotionTask[] };
-      headers: { [key: string]: string[] };
-    } = await client.post("getTasks", { taskIds: [taskId] });
-    const task = tasks.find((t) => t.id === taskId);
+    await sleep(2 ** retries); // Exponential backoff
+    try {
+      const {
+        data: { results: tasks },
+        headers: { "set-cookie": getTasksRequestCookies },
+      }: {
+        data: { results: NotionTask[] };
+        headers: { [key: string]: string[] };
+      } = await client.post("getTasks", { taskIds: [taskId] });
 
-    if (!task) throw new Error(`Task [${taskId}] not found.`);
-    if (task.error) throw new Error(`Export failed with reason: ${task.error}`);
+      const task = tasks.find((t) => t.id === taskId);
 
-    console.log(`Exported ${task.status.pagesExported} pages.`);
+      if (!task) throw new Error(`Task [${taskId}] not found.`);
+      if (task.error) throw new Error(`Export failed with reason: ${task.error}`);
 
-    if (task.state === "success") {
-      exportURL = task.status.exportURL;
-      fileTokenCookie = getTasksRequestCookies.find((cookie) =>
-        cookie.includes("file_token=")
-      );
-      if (!fileTokenCookie) {
-        throw new Error("Task finished but file_token cookie not found.");
+      console.log(`Exported ${task.status.pagesExported} pages.`);
+
+      if (task.state === "success") {
+        exportURL = task.status.exportURL;
+        fileTokenCookie = getTasksRequestCookies.find((cookie) =>
+          cookie.includes("file_token=")
+        );
+        if (!fileTokenCookie) {
+          throw new Error("Task finished but file_token cookie not found.");
+        }
+        console.log(`Export finished.`);
+        break;
       }
-      console.log(`Export finished.`);
-      break;
+
+      retries = 0; // Reset retries on success
+    } catch (error) {
+      if (error.response && error.response.status === 429) {
+        console.log(`Received 429 error, retrying after backoff.`);
+        retries++;
+        continue; // Continue the loop to retry after sleep
+      } else {
+        throw error; // Rethrow if it's not a 429 error
+      }
     }
   }
 
