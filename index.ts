@@ -75,7 +75,6 @@ const exportFromNotion = async (
         data: { results: NotionTask[] };
         headers: { [key: string]: string[] };
       } = await client.post("getTasks", { taskIds: [taskId] });
-
       const task = tasks.find((t) => t.id === taskId);
 
       if (!task) throw new Error(`Task [${taskId}] not found.`);
