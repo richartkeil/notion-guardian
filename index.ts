@@ -94,15 +94,17 @@ const exportFromNotion = async (
         break;
       }
 
-      retries = 0; // Reset retries on success
+      // Reset retries on success
+      retries = 0;
     } catch (error) {
-      if (error.response && error.response.status === 429) {
-        console.log(`Received 429 error, retrying after backoff.`);
+      if (error?.response?.status === 429) {
+        console.log("Received HTTP 429 Too Many Requests error, retrying after backoff.");
         retries++;
-        continue; // Continue the loop to retry after sleep
-      } else {
-        throw error; // Rethrow if it's not a 429 error
+        continue;
       }
+
+      // Rethrow if it's not a 429 error
+      throw error;
     }
   }
 
