@@ -97,7 +97,7 @@ const exportFromNotion = async (
       // Reset retries on success
       retries = 0;
     } catch (error) {
-      if (error?.response?.status === 429) {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
         console.log("Received response with HTTP 429 (Too Many Requests), retrying after backoff.");
         retries += 1;
         continue;
