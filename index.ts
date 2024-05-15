@@ -99,7 +99,7 @@ const exportFromNotion = async (
     } catch (error) {
       if (error?.response?.status === 429) {
         console.log("Received HTTP 429 Too Many Requests error, retrying after backoff.");
-        retries++;
+        retries += 1;
         continue;
       }
 
