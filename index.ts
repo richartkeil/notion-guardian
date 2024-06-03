@@ -63,32 +63,48 @@ const exportFromNotion = async (
 
   let exportURL: string;
   let fileTokenCookie: string | undefined;
+  let retries = 0;
+
   while (true) {
-    await sleep(2);
-    const {
-      data: { results: tasks },
-      headers: { "set-cookie": getTasksRequestCookies },
-    }: {
-      data: { results: NotionTask[] };
-      headers: { [key: string]: string[] };
-    } = await client.post("getTasks", { taskIds: [taskId] });
-    const task = tasks.find((t) => t.id === taskId);
+    await sleep(2 ** retries); // Exponential backoff
+    try {
+      const {
+        data: { results: tasks },
+        headers: { "set-cookie": getTasksRequestCookies },
+      }: {
+        data: { results: NotionTask[] };
+        headers: { [key: string]: string[] };
+      } = await client.post("getTasks", { taskIds: [taskId] });
+      const task = tasks.find((t) => t.id === taskId);
 
-    if (!task) throw new Error(`Task [${taskId}] not found.`);
-    if (task.error) throw new Error(`Export failed with reason: ${task.error}`);
+      if (!task) throw new Error(`Task [${taskId}] not found.`);
+      if (task.error) throw new Error(`Export failed with reason: ${task.error}`);
 
-    console.log(`Exported ${task.status.pagesExported} pages.`);
+      console.log(`Exported ${task.status.pagesExported} pages.`);
 
-    if (task.state === "success") {
-      exportURL = task.status.exportURL;
-      fileTokenCookie = getTasksRequestCookies.find((cookie) =>
-        cookie.includes("file_token=")
-      );
-      if (!fileTokenCookie) {
-        throw new Error("Task finished but file_token cookie not found.");
+      if (task.state === "success") {
+        exportURL = task.status.exportURL;
+        fileTokenCookie = getTasksRequestCookies.find((cookie) =>
+          cookie.includes("file_token=")
+        );
+        if (!fileTokenCookie) {
+          throw new Error("Task finished but file_token cookie not found.");
+        }
+        console.log(`Export finished.`);
+        break;
       }
-      console.log(`Export finished.`);
-      break;
+
+      // Reset retries on success
+      retries = 0;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        console.log("Received response with HTTP 429 (Too Many Requests), retrying after backoff.");
+        retries += 1;
+        continue;
+      }
+
+      // Rethrow if it's not a 429 error
+      throw error;
     }
   }
 
